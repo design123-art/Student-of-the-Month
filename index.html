@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Student of the Month</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<!-- ============ TOP BAR ============ -->
+<header class="topbar">
+  <div class="brand" id="brandBlock">
+    <img id="brandLogo" class="brand-logo hidden" alt="School logo" />
+    <div class="brand-text">
+      <span id="brandName" class="brand-name">Your School Name</span>
+      <span id="brandAddress" class="brand-address">School address goes here</span>
+    </div>
+  </div>
+  <div class="month-pill" id="currentMonthPill">
+    <span class="dot"></span>
+    <span id="currentMonthLabel">Loading…</span>
+  </div>
+</header>
+
+<div class="app-shell">
+
+  <!-- ============ SIDE NAV ============ -->
+  <nav class="side-nav">
+    <button class="nav-item active" data-tab="dashboard">
+      <span class="nav-ico">◆</span> Dashboard
+    </button>
+    <button class="nav-item" data-tab="add">
+      <span class="nav-ico">✦</span> Add Student
+    </button>
+    <button class="nav-item" data-tab="records">
+      <span class="nav-ico">▤</span> Records &amp; Print
+    </button>
+    <button class="nav-item" data-tab="settings">
+      <span class="nav-ico">⚙</span> School Settings
+    </button>
+    <div class="nav-footer">
+      <span id="dbStatus" class="db-status">Connecting…</span>
+    </div>
+  </nav>
+
+  <!-- ============ MAIN CONTENT ============ -->
+  <main class="content">
+
+    <!-- ---------- DASHBOARD ---------- -->
+    <section class="tab-panel active" id="tab-dashboard">
+      <div class="panel-head">
+        <h1>Admin Dashboard</h1>
+        <p class="sub">Overview of Students of the Month across all classes.</p>
+      </div>
+
+      <div class="stat-row">
+        <div class="stat-card">
+          <span class="stat-num" id="statTotal">0</span>
+          <span class="stat-label">Total Honorees</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-num" id="statThisMonth">0</span>
+          <span class="stat-label" id="statThisMonthLabel">This Month</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-num" id="statClasses">0</span>
+          <span class="stat-label">Classes Represented</span>
+        </div>
+      </div>
+
+      <div class="panel-block">
+        <div class="block-head">
+          <h2>Recently Added</h2>
+          <button class="btn btn-primary" data-goto="add">+ Add Student of the Month</button>
+        </div>
+        <div id="recentList" class="recent-list">
+          <p class="empty-note">No students added yet. Click "Add Student of the Month" to begin.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ---------- ADD STUDENT ---------- -->
+    <section class="tab-panel" id="tab-add">
+      <div class="panel-head">
+        <h1>Add Student of the Month</h1>
+        <p class="sub">Fill in the honoree's details below. All fields marked * are required.</p>
+      </div>
+
+      <form id="studentForm" class="form-card">
+
+        <div class="form-grid">
+
+          <!-- Step 1: Photo -->
+          <div class="form-block photo-block">
+            <label class="step-label"><span class="step-num">1</span> Student Photo</label>
+            <div class="photo-drop" id="photoDrop">
+              <img id="photoPreview" class="hidden" alt="Preview" />
+              <div id="photoPlaceholder" class="photo-placeholder">
+                <span class="ph-ico">🖼</span>
+                <span>Click to upload photo</span>
+              </div>
+              <input type="file" id="photoInput" accept="image/*" hidden />
+            </div>
+          </div>
+
+          <!-- Step 2: Details -->
+          <div class="form-block">
+            <label class="step-label"><span class="step-num">2</span> Student Details</label>
+
+            <label class="field-label" for="studentName">Student Name *</label>
+            <input type="text" id="studentName" class="field-input" placeholder="e.g. Ayesha Khan" required />
+
+            <label class="field-label" for="fatherName">Father Name *</label>
+            <input type="text" id="fatherName" class="field-input" placeholder="e.g. Imran Khan" required />
+
+            <div class="two-col">
+              <div>
+                <label class="field-label" for="studentClass">Class *</label>
+                <input type="text" id="studentClass" class="field-input" placeholder="e.g. Class 6" required />
+              </div>
+              <div>
+                <label class="field-label" for="studentSection">Section</label>
+                <input type="text" id="studentSection" class="field-input" placeholder="e.g. B" />
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 3: Month -->
+          <div class="form-block">
+            <label class="step-label"><span class="step-num">3</span> Select Month</label>
+            <select id="selectMonth" class="field-input" required></select>
+            <label class="field-label" for="selectYear" style="margin-top:12px;">Year</label>
+            <input type="number" id="selectYear" class="field-input" />
+          </div>
+
+          <!-- Step 4: Teacher Review -->
+          <div class="form-block">
+            <label class="step-label"><span class="step-num">4</span> Teacher Review</label>
+            <div class="review-grid" id="reviewGrid">
+              <label class="review-chip"><input type="checkbox" value="Punctual" /> Punctual</label>
+              <label class="review-chip"><input type="checkbox" value="No Absent" /> No Absent</label>
+              <label class="review-chip"><input type="checkbox" value="Excellent Progress Report" /> Excellent Progress Report</label>
+              <label class="review-chip"><input type="checkbox" value="Good Behaviour" /> Good Behaviour</label>
+              <label class="review-chip"><input type="checkbox" value="Outstanding Performance" /> Outstanding Performance</label>
+            </div>
+          </div>
+
+          <!-- Step 5: Additional details -->
+          <div class="form-block full">
+            <label class="step-label"><span class="step-num">5</span> Additional Details</label>
+            <textarea id="additionalDetails" class="field-input" rows="3" placeholder="Any extra comments about this student's achievement…"></textarea>
+          </div>
+
+        </div>
+
+        <div class="form-actions">
+          <span id="formMsg" class="form-msg"></span>
+          <button type="submit" class="btn btn-primary" id="saveBtn">Save to Database</button>
+        </div>
+      </form>
+    </section>
+
+    <!-- ---------- RECORDS & PRINT ---------- -->
+    <section class="tab-panel" id="tab-records">
+      <div class="panel-head">
+        <h1>Records &amp; Print</h1>
+        <p class="sub">Filter honorees and generate printable cards.</p>
+      </div>
+
+      <div class="filter-bar">
+        <div class="filter-item">
+          <label>Filter by Month</label>
+          <select id="filterMonth"><option value="">All Months</option></select>
+        </div>
+        <div class="filter-item">
+          <label>Filter by Class</label>
+          <select id="filterClass"><option value="">All Classes</option></select>
+        </div>
+        <button class="btn btn-ghost" id="clearFilters">Clear Filters</button>
+      </div>
+
+      <div class="records-toolbar">
+        <span id="recordsCount">0 records</span>
+        <div class="print-options">
+          <span class="print-label">Print:</span>
+          <button class="btn btn-outline" id="printSingleBtn">Single Card</button>
+          <button class="btn btn-outline" id="printClassBtn">Class-wise Cards</button>
+          <button class="btn btn-outline" id="printAllBtn">All on One A4</button>
+        </div>
+      </div>
+
+      <div id="recordsGrid" class="records-grid"></div>
+    </section>
+
+    <!-- ---------- SCHOOL SETTINGS ---------- -->
+    <section class="tab-panel" id="tab-settings">
+      <div class="panel-head">
+        <h1>School Settings</h1>
+        <p class="sub">This information appears on every printed card and certificate.</p>
+      </div>
+
+      <form id="settingsForm" class="form-card settings-card">
+        <div class="form-block photo-block">
+          <label class="step-label">School Logo</label>
+          <div class="photo-drop small" id="logoDrop">
+            <img id="logoPreview" class="hidden" alt="Logo preview" />
+            <div id="logoPlaceholder" class="photo-placeholder">
+              <span class="ph-ico">🏫</span>
+              <span>Click to upload logo</span>
+            </div>
+            <input type="file" id="logoInput" accept="image/*" hidden />
+          </div>
+        </div>
+
+        <div class="form-block">
+          <label class="field-label" for="schoolName">School Name *</label>
+          <input type="text" id="schoolName" class="field-input" placeholder="e.g. XYZ School System" required />
+
+          <label class="field-label" for="schoolAddress" style="margin-top:12px;">School Address</label>
+          <textarea id="schoolAddress" class="field-input" rows="2" placeholder="e.g. 123 Main Boulevard, Karachi"></textarea>
+        </div>
+
+        <div class="form-actions">
+          <span id="settingsMsg" class="form-msg"></span>
+          <button type="submit" class="btn btn-primary">Save Settings</button>
+        </div>
+      </form>
+    </section>
+
+  </main>
+</div>
+
+<!-- ============ SELECT-CLASS MODAL (for class-wise print) ============ -->
+<div class="modal-overlay hidden" id="classModal">
+  <div class="modal-box">
+    <h3>Select a Class to Print</h3>
+    <select id="classModalSelect"></select>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" id="classModalCancel">Cancel</button>
+      <button class="btn btn-primary" id="classModalConfirm">Print</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ SELECT-SINGLE MODAL ============ -->
+<div class="modal-overlay hidden" id="singleModal">
+  <div class="modal-box">
+    <h3>Select a Student to Print</h3>
+    <select id="singleModalSelect"></select>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" id="singleModalCancel">Cancel</button>
+      <button class="btn btn-primary" id="singleModalConfirm">Print</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ PRINT AREA (only visible when printing) ============ -->
+<div id="printArea" class="print-area"></div>
+
+<!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
+<script src="firebase-config.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

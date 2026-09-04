@@ -1,0 +1,51 @@
+rules_version = '2';
+
+// ============================================================
+// FIRESTORE SECURITY RULES — Student of the Month
+// ============================================================
+// Kahan lagayein:
+//   Firebase Console → Firestore Database → Rules tab →
+//   neeche di gayi puri file paste karein → "Publish" dabayein
+// ============================================================
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ---------- students collection ----------
+    match /students/{studentId} {
+      allow read: if true;                          // records/print/dashboard sab ko dikhne chahiye
+      allow create: if isValidStudent(request.resource.data);
+      allow update: if isValidStudent(request.resource.data);
+      allow delete: if true;                         // koi bhi delete kar sakta hai (no login hai abhi)
+    }
+
+    // ---------- settings/school document ----------
+    match /settings/{docId} {
+      allow read: if true;
+      allow write: if docId == 'school' && isValidSettings(request.resource.data);
+    }
+
+    // ---------- everything else: blocked ----------
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // ---------- validation helpers ----------
+    function isValidStudent(data) {
+      return data.name is string && data.name.size() > 0 && data.name.size() < 100
+        && data.father is string && data.father.size() < 100
+        && data.class is string && data.class.size() > 0 && data.class.size() < 40
+        && data.month is string
+        && data.year is number
+        && (data.photo == null || (data.photo is string && data.photo.size() < 900000))
+        && (data.details == null || (data.details is string && data.details.size() < 1000))
+        && (data.reviews == null || (data.reviews is list && data.reviews.size() < 10));
+    }
+
+    function isValidSettings(data) {
+      return data.name is string && data.name.size() < 150
+        && (data.address == null || (data.address is string && data.address.size() < 300))
+        && (data.logo == null || (data.logo is string && data.logo.size() < 500000));
+    }
+  }
+}
