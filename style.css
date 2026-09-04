@@ -219,6 +219,7 @@ input, select, textarea{ font-family: inherit; }
 .camera-frame video, .camera-frame img{ width:100%; height:100%; object-fit:cover; }
 .camera-error{ color: var(--red); font-size:.82rem; margin-top:10px; text-align:center; }
 .camera-actions{ flex-wrap:wrap; }
+#cameraSwitchBtn{ order: -1; }
 
 /* ============ RESPONSIVE ============ */
 @media (max-width: 880px){
@@ -254,54 +255,78 @@ input, select, textarea{ font-family: inherit; }
   }
 
   .p-card{
-    border: 1.4pt solid #b8923f;
+    position: relative;
+    border: 1.6pt solid #b8923f;
+    outline: 0.6pt solid #b8923f;
+    outline-offset: 3px;
     border-radius: 10px;
-    padding: 14px 10px;
+    padding: 14px 10px 12px;
     display:flex; flex-direction:column; align-items:center; text-align:center;
     break-inside: avoid;
     page-break-inside: avoid;
-    background:#fff;
+    background: linear-gradient(180deg, #fbf7ea 0%, #ffffff 42%);
+    overflow: hidden;
   }
-  .print-single .p-card{ width: 100mm; padding:24px 18px; }
+  .print-single .p-card{ width: 105mm; padding:22px 20px 20px; }
 
-  /* ---- centered header: logo + school name ---- */
+  /* decorative corner flourishes */
+  .p-ribbon-corner{ position:absolute; width:16px; height:16px; border:1.4pt solid #b8923f; }
+  .print-single .p-ribbon-corner{ width:22px; height:22px; }
+  .p-ribbon-tl{ top:6px; left:6px; border-right:none; border-bottom:none; }
+  .p-ribbon-tr{ top:6px; right:6px; border-left:none; border-bottom:none; }
+
+  /* ---- top-center header band: logo + school name + month together ---- */
   .p-header{
-    display:flex; flex-direction:column; align-items:center; gap:3px;
-    margin-bottom:8px; padding-bottom:8px;
-    border-bottom: 0.75pt solid #e4ddc9;
+    display:flex; flex-direction:column; align-items:center; gap:5px;
+    margin-bottom:6px; padding-bottom:8px;
     width:100%;
   }
-  .p-header img{ width:26px; height:26px; object-fit:contain; }
-  .print-single .p-header img{ width:44px; height:44px; }
+  .p-header-row{ display:flex; align-items:center; justify-content:center; gap:6px; }
+  .p-logo{ width:24px; height:24px; object-fit:contain; }
+  .print-single .p-logo{ width:38px; height:38px; }
+  .p-header-text{ display:flex; flex-direction:column; align-items:flex-start; text-align:left; }
 
   .p-school{ font-size:7.5pt; font-weight:700; color:#16233f; text-transform:uppercase; letter-spacing:.5px; }
-  .print-single .p-school{ font-size:11pt; letter-spacing:.6px; }
+  .print-single .p-school{ font-size:11.5pt; letter-spacing:.6px; }
 
-  .p-address{ font-size:5.5pt; color:#8b93a8; }
-  .print-single .p-address{ font-size:7.5pt; }
+  .p-address{ font-size:5.2pt; color:#8b93a8; }
+  .print-single .p-address{ font-size:7pt; }
 
-  /* ---- photo, centered below header ---- */
-  .p-photo{ width:52px; height:52px; border-radius:50%; object-fit:cover; border:1.5pt solid #b8923f; margin-bottom:6px; }
-  .print-single .p-photo{ width:100px; height:100px; margin-bottom:10px; }
+  .p-month{
+    font-size:6.3pt; font-weight:700; color:#fff; background: linear-gradient(135deg,#b8923f,#e4c878);
+    padding:2.5px 11px; border-radius:9px; display:inline-block; letter-spacing:.4px;
+  }
+  .print-single .p-month{ font-size:8.5pt; padding:4px 16px; }
 
-  .p-title{ font-size:6.5pt; color:#b8923f; font-weight:700; letter-spacing:.6px; text-transform:uppercase; margin-bottom:3px; }
-  .print-single .p-title{ font-size:9.5pt; letter-spacing:.8px; margin-bottom:5px; }
+  .p-divider{ display:flex; align-items:center; width:70%; margin:2px 0 8px; }
+  .p-divider::before, .p-divider::after{ content:""; flex:1; height:0.6pt; background:#d8cfa8; }
+  .p-divider span{ color:#b8923f; font-size:6pt; padding:0 6px; }
+  .print-single .p-divider span{ font-size:9pt; }
 
-  .p-name{ font-size:11pt; font-weight:700; color:#16233f; font-family:'Fraunces', Georgia, serif; line-height:1.2; }
-  .print-single .p-name{ font-size:17pt; }
+  /* ---- student section, decorative frame around photo ---- */
+  .p-title{ font-size:6.8pt; color:#b8923f; font-weight:700; letter-spacing:.8px; text-transform:uppercase; margin-bottom:6px; font-family:'Fraunces', Georgia, serif; }
+  .print-single .p-title{ font-size:10pt; letter-spacing:1px; margin-bottom:10px; }
+
+  .p-photo-frame{
+    width:58px; height:58px; border-radius:50%; padding:3px; margin-bottom:6px;
+    background: linear-gradient(135deg,#e4c878,#b8923f);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .print-single .p-photo-frame{ width:110px; height:110px; padding:5px; margin-bottom:10px; }
+  .p-photo{ width:100%; height:100%; border-radius:50%; object-fit:cover; border:1.5pt solid #fff; display:block; }
+
+  .p-name{ font-size:11.5pt; font-weight:700; color:#16233f; font-family:'Fraunces', Georgia, serif; line-height:1.2; }
+  .print-single .p-name{ font-size:18pt; }
 
   .p-meta{ font-size:7pt; color:#5c6270; margin-top:4px; line-height:1.5; }
   .print-single .p-meta{ font-size:9.5pt; margin-top:8px; }
 
-  .p-badges{ margin-top:6px; display:flex; flex-wrap:wrap; gap:3px; justify-content:center; }
-  .p-badge{ font-size:5.8pt; background:#f2ede0; color:#16233f; padding:1.5px 6px; border-radius:8px; font-weight:600; }
+  .p-badges{ margin-top:7px; display:flex; flex-wrap:wrap; gap:3px; justify-content:center; }
+  .p-badge{ font-size:5.8pt; background:#f2ede0; color:#16233f; padding:1.5px 6px; border-radius:8px; font-weight:600; border:0.5pt solid #e4ddc9; }
   .print-single .p-badge{ font-size:8pt; padding:3px 10px; }
 
-  .p-month{ font-size:6.5pt; font-weight:700; color:#fff; background:#b8923f; padding:2px 9px; border-radius:9px; display:inline-block; margin-top:7px; letter-spacing:.3px; }
-  .print-single .p-month{ font-size:9pt; padding:4px 14px; margin-top:12px; }
-
-  .p-comment{ font-size:6.3pt; color:#5c6270; margin-top:5px; font-style:italic; padding:0 4px; }
-  .print-single .p-comment{ font-size:8.5pt; margin-top:10px; max-width:80%; }
+  .p-comment{ font-size:6.3pt; color:#5c6270; margin-top:7px; font-style:italic; padding:0 4px; }
+  .print-single .p-comment{ font-size:8.5pt; margin-top:12px; max-width:85%; }
 
   .class-sheet-title{
     grid-column: 1 / -1;

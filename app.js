@@ -323,15 +323,28 @@ function escapeHtml(str){
 function cardHtml(s){
   return `
     <div class="p-card">
+      <div class="p-ribbon-corner p-ribbon-tl"></div>
+      <div class="p-ribbon-corner p-ribbon-tr"></div>
+
+      <!-- Top center: logo + school name + month, all together -->
       <div class="p-header">
-        ${schoolSettings.logo ? `<img src="${schoolSettings.logo}" alt="">` : ""}
-        <span class="p-school">${escapeHtml(schoolSettings.name || "School Name")}</span>
-        ${schoolSettings.address ? `<span class="p-address">${escapeHtml(schoolSettings.address)}</span>` : ""}
+        <div class="p-header-row">
+          ${schoolSettings.logo ? `<img class="p-logo" src="${schoolSettings.logo}" alt="">` : ""}
+          <div class="p-header-text">
+            <span class="p-school">${escapeHtml(schoolSettings.name || "School Name")}</span>
+            ${schoolSettings.address ? `<span class="p-address">${escapeHtml(schoolSettings.address)}</span>` : ""}
+          </div>
+        </div>
+        <span class="p-month">${escapeHtml(s.month)} ${s.year || ""}</span>
       </div>
 
-      <img class="p-photo" src="${s.photo || placeholderImg()}" alt="">
+      <div class="p-divider"><span>✦</span></div>
 
+      <!-- Student section with decorative frame -->
       <div class="p-title">Student of the Month</div>
+      <div class="p-photo-frame">
+        <img class="p-photo" src="${s.photo || placeholderImg()}" alt="">
+      </div>
       <div class="p-name">${escapeHtml(s.name)}</div>
       <div class="p-meta">
         Father: ${escapeHtml(s.father || "-")}<br>
@@ -339,7 +352,6 @@ function cardHtml(s){
       </div>
 
       <div class="p-badges">${(s.reviews||[]).map(r => `<span class="p-badge">${escapeHtml(r)}</span>`).join("")}</div>
-      <span class="p-month">${s.month} ${s.year || ""}</span>
       ${s.details ? `<div class="p-comment">"${escapeHtml(s.details)}"</div>` : ""}
     </div>
   `;
@@ -396,29 +408,55 @@ $("printAllBtn").addEventListener("click", () => {
 let cameraStream = null;
 let cameraTarget = null;       // "student" | "logo"
 let capturedDataUrl = null;
+// "environment" = back/rear camera (best for photographing a student or a logo),
+// "user" = front/selfie camera. Student photos default to back camera;
+// the Switch Camera button lets the user flip either way at any time.
+let cameraFacing = "environment";
+
+async function startCameraStream(facing){
+  stopCameraStream();
+  $("cameraError").classList.add("hidden");
+
+  const tryConstraints = [
+    { video: { facingMode: { exact: facing } }, audio: false },
+    { video: { facingMode: facing }, audio: false },
+    { video: true, audio: false } // last-resort fallback: any available camera
+  ];
+
+  let lastErr = null;
+  for (const constraints of tryConstraints){
+    try{
+      cameraStream = await navigator.mediaDevices.getUserMedia(constraints);
+      $("cameraVideo").srcObject = cameraStream;
+      cameraFacing = facing;
+      return true;
+    }catch(err){
+      lastErr = err;
+    }
+  }
+  console.error("Camera error:", lastErr);
+  return false;
+}
 
 async function openCamera(target){
   cameraTarget = target;
   capturedDataUrl = null;
+  cameraFacing = "environment"; // always start on back camera — best for photographing someone/something
   $("cameraError").classList.add("hidden");
   $("cameraVideo").classList.remove("hidden");
   $("cameraCapturedImg").classList.add("hidden");
   $("cameraShotBtn").classList.remove("hidden");
   $("cameraUseBtn").classList.add("hidden");
   $("cameraRetakeBtn").classList.add("hidden");
+  $("cameraSwitchBtn").classList.remove("hidden");
   $("cameraModal").classList.remove("hidden");
 
-  try{
-    cameraStream = await navigator.mediaDevices.getUserMedia({
-      video: { facingMode: "user" },
-      audio: false
-    });
-    $("cameraVideo").srcObject = cameraStream;
-  }catch(err){
-    console.error("Camera error:", err);
+  const ok = await startCameraStream(cameraFacing);
+  if (!ok){
     $("cameraError").textContent = "Could not access camera. Please allow camera permission, or use Upload Photo instead.";
     $("cameraError").classList.remove("hidden");
     $("cameraShotBtn").classList.add("hidden");
+    $("cameraSwitchBtn").classList.add("hidden");
   }
 }
 
@@ -436,6 +474,15 @@ function closeCamera(){
 
 $("cameraCancelBtn").addEventListener("click", closeCamera);
 
+$("cameraSwitchBtn").addEventListener("click", async () => {
+  const nextFacing = cameraFacing === "environment" ? "user" : "environment";
+  const ok = await startCameraStream(nextFacing);
+  if (!ok){
+    $("cameraError").textContent = "Could not switch camera on this device.";
+    $("cameraError").classList.remove("hidden");
+  }
+});
+
 $("cameraShotBtn").addEventListener("click", () => {
   const video = $("cameraVideo");
   const canvas = $("cameraCanvas");
@@ -450,6 +497,7 @@ $("cameraShotBtn").addEventListener("click", () => {
   $("cameraCapturedImg").classList.remove("hidden");
   $("cameraVideo").classList.add("hidden");
   $("cameraShotBtn").classList.add("hidden");
+  $("cameraSwitchBtn").classList.add("hidden");
   $("cameraRetakeBtn").classList.remove("hidden");
   $("cameraUseBtn").classList.remove("hidden");
 });
@@ -459,6 +507,7 @@ $("cameraRetakeBtn").addEventListener("click", () => {
   $("cameraCapturedImg").classList.add("hidden");
   $("cameraVideo").classList.remove("hidden");
   $("cameraShotBtn").classList.remove("hidden");
+  $("cameraSwitchBtn").classList.remove("hidden");
   $("cameraRetakeBtn").classList.add("hidden");
   $("cameraUseBtn").classList.add("hidden");
 });
