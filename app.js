@@ -81,7 +81,7 @@ function populateMonthSelects(){
    ============================================================== */
 let logoBase64 = "";
 
-$("logoDrop").addEventListener("click", () => $("logoInput").click());
+$("logoUploadBtn").addEventListener("click", () => $("logoInput").click());
 $("logoInput").addEventListener("change", async (e) => {
   const file = e.target.files[0];
   if (!file) return;
@@ -90,6 +90,7 @@ $("logoInput").addEventListener("change", async (e) => {
   $("logoPreview").classList.remove("hidden");
   $("logoPlaceholder").classList.add("hidden");
 });
+$("logoCameraBtn").addEventListener("click", () => openCamera("logo"));
 
 $("settingsForm").addEventListener("submit", async (e) => {
   e.preventDefault();
@@ -143,7 +144,7 @@ async function loadSettings(){
    ============================================================== */
 let photoBase64 = "";
 
-$("photoDrop").addEventListener("click", () => $("photoInput").click());
+$("photoUploadBtn").addEventListener("click", () => $("photoInput").click());
 $("photoInput").addEventListener("change", async (e) => {
   const file = e.target.files[0];
   if (!file) return;
@@ -152,6 +153,7 @@ $("photoInput").addEventListener("change", async (e) => {
   $("photoPreview").classList.remove("hidden");
   $("photoPlaceholder").classList.add("hidden");
 });
+$("photoCameraBtn").addEventListener("click", () => openCamera("student"));
 
 $("studentForm").addEventListener("submit", async (e) => {
   e.preventDefault();
@@ -321,22 +323,24 @@ function escapeHtml(str){
 function cardHtml(s){
   return `
     <div class="p-card">
-      <img class="p-photo" src="${s.photo || placeholderImg()}" alt="">
-      <div class="p-info">
-        <div class="p-header">
-          ${schoolSettings.logo ? `<img src="${schoolSettings.logo}" alt="">` : ""}
-          <span class="p-school">${escapeHtml(schoolSettings.name || "School Name")}</span>
-        </div>
-        <div class="p-title">Student of the Month</div>
-        <div class="p-name">${escapeHtml(s.name)}</div>
-        <div class="p-meta">
-          Father: ${escapeHtml(s.father || "-")}<br>
-          ${escapeHtml(s.class)}${s.section ? " · Section " + escapeHtml(s.section) : ""}
-        </div>
-        <div class="p-badges">${(s.reviews||[]).map(r => `<span class="p-badge">${escapeHtml(r)}</span>`).join("")}</div>
-        <span class="p-month">${s.month} ${s.year || ""}</span>
-        ${s.details ? `<div class="p-comment">"${escapeHtml(s.details)}"</div>` : ""}
+      <div class="p-header">
+        ${schoolSettings.logo ? `<img src="${schoolSettings.logo}" alt="">` : ""}
+        <span class="p-school">${escapeHtml(schoolSettings.name || "School Name")}</span>
+        ${schoolSettings.address ? `<span class="p-address">${escapeHtml(schoolSettings.address)}</span>` : ""}
       </div>
+
+      <img class="p-photo" src="${s.photo || placeholderImg()}" alt="">
+
+      <div class="p-title">Student of the Month</div>
+      <div class="p-name">${escapeHtml(s.name)}</div>
+      <div class="p-meta">
+        Father: ${escapeHtml(s.father || "-")}<br>
+        ${escapeHtml(s.class)}${s.section ? " · Section " + escapeHtml(s.section) : ""}
+      </div>
+
+      <div class="p-badges">${(s.reviews||[]).map(r => `<span class="p-badge">${escapeHtml(r)}</span>`).join("")}</div>
+      <span class="p-month">${s.month} ${s.year || ""}</span>
+      ${s.details ? `<div class="p-comment">"${escapeHtml(s.details)}"</div>` : ""}
     </div>
   `;
 }
@@ -384,6 +388,100 @@ $("printAllBtn").addEventListener("click", () => {
   const list = getFilteredStudents();
   if (list.length === 0){ alert("No records to print."); return; }
   doPrint(list.map(cardHtml).join(""), "print-grid");
+});
+
+/* ==============================================================
+   CAMERA CAPTURE (shared by student photo + school logo)
+   ============================================================== */
+let cameraStream = null;
+let cameraTarget = null;       // "student" | "logo"
+let capturedDataUrl = null;
+
+async function openCamera(target){
+  cameraTarget = target;
+  capturedDataUrl = null;
+  $("cameraError").classList.add("hidden");
+  $("cameraVideo").classList.remove("hidden");
+  $("cameraCapturedImg").classList.add("hidden");
+  $("cameraShotBtn").classList.remove("hidden");
+  $("cameraUseBtn").classList.add("hidden");
+  $("cameraRetakeBtn").classList.add("hidden");
+  $("cameraModal").classList.remove("hidden");
+
+  try{
+    cameraStream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: "user" },
+      audio: false
+    });
+    $("cameraVideo").srcObject = cameraStream;
+  }catch(err){
+    console.error("Camera error:", err);
+    $("cameraError").textContent = "Could not access camera. Please allow camera permission, or use Upload Photo instead.";
+    $("cameraError").classList.remove("hidden");
+    $("cameraShotBtn").classList.add("hidden");
+  }
+}
+
+function stopCameraStream(){
+  if (cameraStream){
+    cameraStream.getTracks().forEach(t => t.stop());
+    cameraStream = null;
+  }
+}
+
+function closeCamera(){
+  stopCameraStream();
+  $("cameraModal").classList.add("hidden");
+}
+
+$("cameraCancelBtn").addEventListener("click", closeCamera);
+
+$("cameraShotBtn").addEventListener("click", () => {
+  const video = $("cameraVideo");
+  const canvas = $("cameraCanvas");
+  const w = video.videoWidth || 480;
+  const h = video.videoHeight || 360;
+  canvas.width = w;
+  canvas.height = h;
+  canvas.getContext("2d").drawImage(video, 0, 0, w, h);
+  capturedDataUrl = canvas.toDataURL("image/jpeg", 0.85);
+
+  $("cameraCapturedImg").src = capturedDataUrl;
+  $("cameraCapturedImg").classList.remove("hidden");
+  $("cameraVideo").classList.add("hidden");
+  $("cameraShotBtn").classList.add("hidden");
+  $("cameraRetakeBtn").classList.remove("hidden");
+  $("cameraUseBtn").classList.remove("hidden");
+});
+
+$("cameraRetakeBtn").addEventListener("click", () => {
+  capturedDataUrl = null;
+  $("cameraCapturedImg").classList.add("hidden");
+  $("cameraVideo").classList.remove("hidden");
+  $("cameraShotBtn").classList.remove("hidden");
+  $("cameraRetakeBtn").classList.add("hidden");
+  $("cameraUseBtn").classList.add("hidden");
+});
+
+$("cameraUseBtn").addEventListener("click", async () => {
+  if (!capturedDataUrl) return;
+
+  // re-compress to keep file sizes small, same pipeline as uploads
+  const blob = await (await fetch(capturedDataUrl)).blob();
+  const compressed = await fileToCompressedBase64(blob, cameraTarget === "logo" ? 300 : 400, cameraTarget === "logo" ? 0.85 : 0.72);
+
+  if (cameraTarget === "student"){
+    photoBase64 = compressed;
+    $("photoPreview").src = compressed;
+    $("photoPreview").classList.remove("hidden");
+    $("photoPlaceholder").classList.add("hidden");
+  }else{
+    logoBase64 = compressed;
+    $("logoPreview").src = compressed;
+    $("logoPreview").classList.remove("hidden");
+    $("logoPlaceholder").classList.add("hidden");
+  }
+  closeCamera();
 });
 
 /* ==============================================================

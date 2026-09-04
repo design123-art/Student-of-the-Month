@@ -100,9 +100,13 @@
               <img id="photoPreview" class="hidden" alt="Preview" />
               <div id="photoPlaceholder" class="photo-placeholder">
                 <span class="ph-ico">🖼</span>
-                <span>Click to upload photo</span>
+                <span>No photo selected</span>
               </div>
               <input type="file" id="photoInput" accept="image/*" hidden />
+            </div>
+            <div class="photo-actions">
+              <button type="button" class="btn btn-outline btn-sm" id="photoUploadBtn">📁 Upload Photo</button>
+              <button type="button" class="btn btn-outline btn-sm" id="photoCameraBtn">📷 Take Photo</button>
             </div>
           </div>
 
@@ -209,9 +213,13 @@
             <img id="logoPreview" class="hidden" alt="Logo preview" />
             <div id="logoPlaceholder" class="photo-placeholder">
               <span class="ph-ico">🏫</span>
-              <span>Click to upload logo</span>
+              <span>No logo selected</span>
             </div>
             <input type="file" id="logoInput" accept="image/*" hidden />
+          </div>
+          <div class="photo-actions">
+            <button type="button" class="btn btn-outline btn-sm" id="logoUploadBtn">📁 Upload Logo</button>
+            <button type="button" class="btn btn-outline btn-sm" id="logoCameraBtn">📷 Take Photo</button>
           </div>
         </div>
 
@@ -259,6 +267,25 @@
 
 <!-- ============ PRINT AREA (only visible when printing) ============ -->
 <div id="printArea" class="print-area"></div>
+
+<!-- ============ CAMERA CAPTURE MODAL ============ -->
+<div class="modal-overlay hidden" id="cameraModal">
+  <div class="modal-box camera-box">
+    <h3>Take a Photo</h3>
+    <div class="camera-frame">
+      <video id="cameraVideo" autoplay playsinline></video>
+      <canvas id="cameraCanvas" class="hidden"></canvas>
+      <img id="cameraCapturedImg" class="hidden" alt="Captured" />
+    </div>
+    <p id="cameraError" class="camera-error hidden"></p>
+    <div class="modal-actions camera-actions">
+      <button class="btn btn-ghost" id="cameraCancelBtn">Cancel</button>
+      <button class="btn btn-outline hidden" id="cameraRetakeBtn">Retake</button>
+      <button class="btn btn-primary" id="cameraShotBtn">📷 Capture</button>
+      <button class="btn btn-primary hidden" id="cameraUseBtn">Use Photo</button>
+    </div>
+  </div>
+</div>
 
 <!-- Firebase SDKs -->
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>

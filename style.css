@@ -149,13 +149,15 @@ input, select, textarea{ font-family: inherit; }
 .photo-drop{
   position:relative; border:2px dashed var(--line); border-radius: var(--radius);
   height: 220px; display:flex; align-items:center; justify-content:center;
-  cursor:pointer; overflow:hidden; background: var(--paper);
+  overflow:hidden; background: var(--paper);
 }
 .photo-drop.small{ height:130px; }
-.photo-drop:hover{ border-color: var(--gold); }
 .photo-drop img{ width:100%; height:100%; object-fit:cover; }
 .photo-placeholder{ display:flex; flex-direction:column; align-items:center; gap:6px; color: var(--ink-soft); font-size:.85rem; }
 .ph-ico{ font-size:1.8rem; }
+
+.photo-actions{ display:flex; gap:8px; margin-top:10px; }
+.btn-sm{ padding:7px 12px; font-size:.8rem; flex:1; }
 
 .review-grid{ display:flex; flex-direction:column; gap:8px; }
 .review-chip{
@@ -208,6 +210,16 @@ input, select, textarea{ font-family: inherit; }
 .modal-box select{ width:100%; padding:9px 12px; border:1px solid var(--line); border-radius:8px; }
 .modal-actions{ display:flex; justify-content:flex-end; gap:10px; margin-top:18px; }
 
+/* ---- Camera capture modal ---- */
+.camera-box{ width: 420px; max-width: 92vw; }
+.camera-frame{
+  position:relative; width:100%; aspect-ratio: 4/3; background:#0d1526;
+  border-radius:8px; overflow:hidden; display:flex; align-items:center; justify-content:center;
+}
+.camera-frame video, .camera-frame img{ width:100%; height:100%; object-fit:cover; }
+.camera-error{ color: var(--red); font-size:.82rem; margin-top:10px; text-align:center; }
+.camera-actions{ flex-wrap:wrap; }
+
 /* ============ RESPONSIVE ============ */
 @media (max-width: 880px){
   .app-shell{ flex-direction:column; }
@@ -243,42 +255,53 @@ input, select, textarea{ font-family: inherit; }
 
   .p-card{
     border: 1.4pt solid #b8923f;
-    border-radius: 8px;
-    padding: 10px;
-    display:flex; gap:10px;
+    border-radius: 10px;
+    padding: 14px 10px;
+    display:flex; flex-direction:column; align-items:center; text-align:center;
     break-inside: avoid;
     page-break-inside: avoid;
     background:#fff;
   }
-  .print-single .p-card{ width: 95mm; padding:16px; gap:14px; }
+  .print-single .p-card{ width: 100mm; padding:24px 18px; }
 
-  .p-photo{ width:60px; height:60px; border-radius:6px; object-fit:cover; border:1px solid #e4ddc9; flex-shrink:0; }
-  .print-single .p-photo{ width:110px; height:110px; }
+  /* ---- centered header: logo + school name ---- */
+  .p-header{
+    display:flex; flex-direction:column; align-items:center; gap:3px;
+    margin-bottom:8px; padding-bottom:8px;
+    border-bottom: 0.75pt solid #e4ddc9;
+    width:100%;
+  }
+  .p-header img{ width:26px; height:26px; object-fit:contain; }
+  .print-single .p-header img{ width:44px; height:44px; }
 
-  .p-info{ flex:1; min-width:0; }
-  .p-header{ display:flex; align-items:center; gap:6px; margin-bottom:3px; }
-  .p-header img{ width:16px; height:16px; object-fit:contain; }
-  .p-school{ font-size:7.5pt; font-weight:700; color:#16233f; text-transform:uppercase; letter-spacing:.3px; }
-  .print-single .p-school{ font-size:10pt; }
+  .p-school{ font-size:7.5pt; font-weight:700; color:#16233f; text-transform:uppercase; letter-spacing:.5px; }
+  .print-single .p-school{ font-size:11pt; letter-spacing:.6px; }
 
-  .p-title{ font-size:7pt; color:#b8923f; font-weight:700; letter-spacing:.4px; text-transform:uppercase; margin-bottom:2px; }
-  .print-single .p-title{ font-size:9pt; }
+  .p-address{ font-size:5.5pt; color:#8b93a8; }
+  .print-single .p-address{ font-size:7.5pt; }
 
-  .p-name{ font-size:11pt; font-weight:700; color:#16233f; font-family:'Fraunces', Georgia, serif; line-height:1.15; }
-  .print-single .p-name{ font-size:15pt; }
+  /* ---- photo, centered below header ---- */
+  .p-photo{ width:52px; height:52px; border-radius:50%; object-fit:cover; border:1.5pt solid #b8923f; margin-bottom:6px; }
+  .print-single .p-photo{ width:100px; height:100px; margin-bottom:10px; }
 
-  .p-meta{ font-size:7.5pt; color:#5c6270; margin-top:2px; line-height:1.4; }
-  .print-single .p-meta{ font-size:9.5pt; }
+  .p-title{ font-size:6.5pt; color:#b8923f; font-weight:700; letter-spacing:.6px; text-transform:uppercase; margin-bottom:3px; }
+  .print-single .p-title{ font-size:9.5pt; letter-spacing:.8px; margin-bottom:5px; }
 
-  .p-badges{ margin-top:4px; display:flex; flex-wrap:wrap; gap:2px; }
-  .p-badge{ font-size:6pt; background:#f2ede0; color:#16233f; padding:1px 5px; border-radius:8px; font-weight:600; }
-  .print-single .p-badge{ font-size:7.5pt; padding:2px 8px; }
+  .p-name{ font-size:11pt; font-weight:700; color:#16233f; font-family:'Fraunces', Georgia, serif; line-height:1.2; }
+  .print-single .p-name{ font-size:17pt; }
 
-  .p-month{ font-size:6.5pt; font-weight:700; color:#fff; background:#b8923f; padding:1px 6px; border-radius:8px; display:inline-block; margin-top:4px; }
-  .print-single .p-month{ font-size:8.5pt; padding:2px 9px; }
+  .p-meta{ font-size:7pt; color:#5c6270; margin-top:4px; line-height:1.5; }
+  .print-single .p-meta{ font-size:9.5pt; margin-top:8px; }
 
-  .p-comment{ font-size:6.5pt; color:#5c6270; margin-top:3px; font-style:italic; }
-  .print-single .p-comment{ font-size:8.5pt; }
+  .p-badges{ margin-top:6px; display:flex; flex-wrap:wrap; gap:3px; justify-content:center; }
+  .p-badge{ font-size:5.8pt; background:#f2ede0; color:#16233f; padding:1.5px 6px; border-radius:8px; font-weight:600; }
+  .print-single .p-badge{ font-size:8pt; padding:3px 10px; }
+
+  .p-month{ font-size:6.5pt; font-weight:700; color:#fff; background:#b8923f; padding:2px 9px; border-radius:9px; display:inline-block; margin-top:7px; letter-spacing:.3px; }
+  .print-single .p-month{ font-size:9pt; padding:4px 14px; margin-top:12px; }
+
+  .p-comment{ font-size:6.3pt; color:#5c6270; margin-top:5px; font-style:italic; padding:0 4px; }
+  .print-single .p-comment{ font-size:8.5pt; margin-top:10px; max-width:80%; }
 
   .class-sheet-title{
     grid-column: 1 / -1;
